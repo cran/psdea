@@ -1,0 +1,67 @@
+---
+title: "Reference-set data envelopment analysis with psdea"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reference-set data envelopment analysis with psdea}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## The idea
+
+A DEA score is a distance to a frontier, and the frontier is built from peers.
+`psdea» makes the peer set an argument.  The weight matrix is used only through
+its non-zero pattern: a non-zero off-diagonal entry means that the column unit
+may enter the frontier of the row unit, and the unit itself is always included.
+
+## A three-unit example
+
+Three units use one unit of input and produce 1, 2 and 4 units of output.
+
+```{r}
+library(psdea)
+X <- matrix(c(1, 1, 1), nrow = 1)
+Y <- matrix(c(1, 2, 4), nrow = 1)
+round(psdea_sbm(X, Y)$eff, 4)
+```
+
+The scores are the ratio to the best observed ratio, 4.  Restricting unit 1 to
+units 1 and 2 lowers the best ratio to 2:
+
+```{r}
+W <- matrix(c(0, 1, 0,
+              1, 0, 1,
+              0, 1, 0), 3, 3, byrow = TRUE)
+round(psdea_sbm(X, Y, W = W)$eff_loc, 4)
+```
+
+## A panel
+
+```{r}
+data(psdea_china_energy)
+d <- subset(psdea_china_energy, year == 2015 & code <= 8)
+W <- psdea_w_contiguity[1:8, 1:8]
+fit <- psdea_panel(d, "gdp_real", c("capital", "energy"), "year",
+                   id = "code", bad = "co2", W = W)
+fit
+```
+
+The two shares decompose the shortfall, and they are missing on the frontier
+because the denominator is zero there:
+
+```{r}
+fit[, c("eff", "eff_loc", "s_local", "s_gap")]
+```
+
+## Learning the peers
+
+When the analyst has no prior on who the peers are, the matrix can be built by
+sparse non-negative reconstruction of each unit's bundle:
+
+```{r}
+Wl <- psdea_learn_data(d, c("capital", "energy", "gdp_real"), lambda = 0.05, by = "year")
+attr(Wl, "n_peers")
+fit_l <- psdea_panel(d, "gdp_real", c("capital", "energy"), "year",
+                     id = "code", bad = "co2", W = Wl)
+mean(fit_l$tgr, na.rm = TRUE)
+```

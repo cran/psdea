@@ -1,0 +1,31 @@
+Package: psdea
+Type: Package
+Title: Data Envelopment Analysis with User-Defined and Learned
+        Reference Sets
+Version: 1.0.0
+Authors@R: person("Jiachao", "Peng", email = "jiachao.peng@wit.edu.cn",
+    role = c("aut", "cre"))
+Author: Jiachao Peng [aut, cre]
+Maintainer: Jiachao Peng <jiachao.peng@wit.edu.cn>
+Description: Slacks-based data envelopment analysis for panel data in which the
+    reference set is an explicit argument.  A user-supplied weight matrix, or a
+    matrix learned from the data by penalised non-negative reconstruction,
+    selects the units that may enter each decision-making unit's frontier.  The
+    package reports the unrestricted and the restricted score, the ratio of the
+    two and an exact decomposition of the shortfall into the part the restricted
+    technology can remove and the part it cannot.  Moran's I and local
+    indicators of spatial association are provided as diagnostics.  All linear
+    programs are solved by a two-phase simplex with Bland's rule implemented in
+    R, so the package needs no compiler.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.0)
+Imports: utils
+Suggests: testthat (>= 3.0.0), knitr, rmarkdown
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+NeedsCompilation: no
+Packaged: 2026-10-18 12:52:49 UTC; jiach
+Repository: CRAN
+Date/Publication: 2026-10-28 11:10:02 UTC
